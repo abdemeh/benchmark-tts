@@ -255,15 +255,42 @@ def detect_hardware() -> tuple[str, str, str]:
     return "CPU", cpu, cpu
 
 # ─── Docker helpers ───────────────────────────────────────────────────────────
+def stop_all_containers() -> None:
+    """Kill every running container before starting a benchmark engine."""
+    result = subprocess.run(
+        ["docker", "ps", "--format", "{{.ID}}\t{{.Names}}"],
+        capture_output=True, text=True
+    )
+    lines = [l.strip() for l in result.stdout.splitlines() if l.strip()]
+    if not lines:
+        print(f"  {c('✓ Aucun conteneur actif', 'dim')}")
+        return
+    print(f"  {c('⚠', 'yellow')} {len(lines)} conteneur(s) actif(s) détecté(s) — arrêt en cours…")
+    for line in lines:
+        cid, *name_parts = line.split("\t")
+        name = name_parts[0] if name_parts else cid
+        subprocess.run(["docker", "stop", cid], capture_output=True)
+        print(f"  {c('■', 'dim')} Arrêté : {name}")
+
 def compose_up(engine_id: str) -> bool:
     cfg = ENGINES[engine_id]
     compose_dir = TOOLING_DIR / cfg["compose_dir"]
     compose_file = cfg["compose_file"]
     print(f"  {c('▶', 'cyan')} Démarrage {c(engine_id, 'bold')} ({compose_file}) …", flush=True)
     cmd = ["docker", "compose", "-f", str(compose_dir / compose_file), "up", "-d", "--build"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(c(f"  ✗ Erreur docker compose up:\n{result.stderr[-800:]}", "red"))
+    # Stream output line by line so the user sees build progress
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True, bufsize=1
+    )
+    assert process.stdout is not None
+    for line in process.stdout:
+        line = line.rstrip()
+        if line:
+            print(f"  {c('│', 'dim')} {line}")
+    process.wait()
+    if process.returncode != 0:
+        print(c(f"  ✗ docker compose up a échoué (code {process.returncode})", "red"))
         return False
     return True
 
@@ -271,8 +298,12 @@ def compose_down(engine_id: str) -> None:
     cfg = ENGINES[engine_id]
     compose_dir = TOOLING_DIR / cfg["compose_dir"]
     compose_file = cfg["compose_file"]
+    print(f"  {c('■', 'dim')} Arrêt {engine_id} …", flush=True)
     cmd = ["docker", "compose", "-f", str(compose_dir / compose_file), "down"]
-    subprocess.run(cmd, capture_output=True)
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.stdout.strip():
+        for line in result.stdout.strip().splitlines():
+            print(f"  {c('│', 'dim')} {line}")
     print(f"  {c('■', 'dim')} {engine_id} arrêté")
 
 def wait_ready(engine_id: str, timeout: int = 600) -> bool:
@@ -497,17 +528,26 @@ def choose_engines() -> list[str]:
     print(sep())
     print(c("  Moteurs disponibles :", "bold"))
     print()
+    # header
+    print(f"  {'':3s}  {'Nom':<18s}  {'Qualité':<12s}  {'HW':<10s}  {'Voix (total)'}")
+    print(f"  {sep('-', 70)}")
     print(c("  TTS", "cyan"))
     for i, eid in enumerate(tts_ids, 1):
         card = ENGINES[eid]["card"]
         compose = ENGINES[eid]["compose_file"]
-        gpu_tag = c(" [GPU]", "yellow") if "gpu" in compose else c(" [CPU]", "dim")
-        print(f"  {c(str(i), 'yellow')}  {c(card['name'], 'bold'):20s}  {card['voiceQuality']}-quality{gpu_tag}")
+        gpu_tag = c("GPU", "yellow") if "gpu" in compose else c("CPU", "dim")
+        voices = ENGINES[eid]["voices"]
+        voice_labels = ", ".join(v.replace(".wav", "") for v in voices)
+        voice_count = c(f"({len(voices)})", "dim")
+        print(f"  {c(str(i), 'yellow'):>3s}  {c(card['name'], 'bold'):<28s}  {card['voiceQuality']+'-quality':<12s}  {gpu_tag:<18s}  {voice_labels} {voice_count}")
     print()
     print(c("  STT", "cyan"))
     for i, eid in enumerate(stt_ids, len(tts_ids) + 1):
         card = ENGINES[eid]["card"]
-        print(f"  {c(str(i), 'yellow')}  {c(card['name'], 'bold'):20s}  {card['hardware']}")
+        voices = ENGINES[eid]["voices"]
+        voice_labels = ", ".join(v.replace(".wav", "") for v in voices)
+        voice_count = c(f"({len(voices)})", "dim")
+        print(f"  {c(str(i), 'yellow'):>3s}  {c(card['name'], 'bold'):<28s}  {card['voiceQuality']+'-quality':<12s}  {c('GPU', 'yellow'):<18s}  {voice_labels} {voice_count}")
     print()
     print(f"  {c('*', 'yellow')}  {c('Tous les moteurs', 'bold')}")
     print()
@@ -627,6 +667,13 @@ def main() -> None:
     session["meta"]["sentences"] = TEST_SENTENCES
 
     all_results: dict[str, tuple[list[dict], list[float]]] = {}
+
+    # ── Pre-flight: stop any running containers ────────────────────────────
+    print()
+    print(sep())
+    print(c("  Vérification des conteneurs actifs…", "bold"))
+    stop_all_containers()
+    print(sep())
 
     for engine_id in selected_engines:
         print()
