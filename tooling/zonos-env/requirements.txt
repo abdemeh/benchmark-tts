@@ -1,4 +1,3 @@
 fastapi
 uvicorn[standard]==0.30.1
 numpy
-zonos @ git+https://github.com/Zyphra/Zonos.git
