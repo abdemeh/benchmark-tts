@@ -50,10 +50,11 @@ fi
 # ─── 3. NVIDIA Container Toolkit (GPU passthrough) ────────────────────────────
 if ! dpkg -l | grep -q nvidia-container-toolkit 2>/dev/null; then
     info "Installing NVIDIA Container Toolkit…"
-    distribution=$(. /etc/os-release; echo "$ID$VERSION_ID")
+    # Remove any corrupted source list from a previous attempt
+    sudo rm -f /etc/apt/sources.list.d/nvidia-container-toolkit.list
     curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
         | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
-    curl -sL "https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list" \
+    curl -sL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
         | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
         | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
     sudo apt-get update -qq
