@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  vibevoice-ai:
+    build: .
+    container_name: vibevoice-local-ai
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

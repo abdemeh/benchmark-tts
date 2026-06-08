@@ -1,0 +1,27 @@
+services:
+  f5tts:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    container_name: f5tts-gpu-api
+    ports:
+      - "8012:8012"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - DEVICE=cuda
+      - DEFAULT_VOICE=default
+      - F5TTS_MODEL=F5TTS_v1_Base
+    volumes:
+      - ./voices:/app/voices
+      - f5tts-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  f5tts-cache:

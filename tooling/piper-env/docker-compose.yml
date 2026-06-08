@@ -1,0 +1,14 @@
+services:
+  piper-tts:
+    image: artibex/piper-http:latest
+    container_name: piper-local-api
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      - MODEL_DOWNLOAD_LINK=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx?download=true
+    volumes:
+      - piper-models:/app/models
+
+volumes:
+  piper-models:

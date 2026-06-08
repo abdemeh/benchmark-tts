@@ -1,0 +1,20 @@
+# Docker model caches (re-downloaded on first run)
+tooling/**/models/
+tooling/*/cache/
+
+# Benchmark outputs (generated at runtime)
+scripts/orion-benchmark/wavs/
+scripts/orion-benchmark/results/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db

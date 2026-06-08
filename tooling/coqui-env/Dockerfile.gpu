@@ -1,0 +1,3 @@
+FROM ghcr.io/coqui-ai/xtts-streaming-server:latest
+
+COPY main_patch.py /app/main.py

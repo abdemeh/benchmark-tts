@@ -1,0 +1,23 @@
+services:
+  vibevoice-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    container_name: vibevoice-gpu-api
+    ports:
+      - "8020:8000"
+    restart: unless-stopped
+    environment:
+      - DEVICE=cuda
+    volumes:
+      - vibevoice-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  vibevoice-cache:

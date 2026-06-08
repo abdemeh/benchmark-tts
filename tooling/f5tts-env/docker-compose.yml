@@ -1,0 +1,23 @@
+services:
+  f5tts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: f5tts-local-api
+    ports:
+      - "8012:8012"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - DEVICE=cpu
+      - DEFAULT_VOICE=orion
+      # French fine-tune model (RASPIAUDIO — trained on LibriVox French)
+      - F5TTS_MODEL=F5TTS_Base
+      - F5TTS_CKPT_FILE=hf://RASPIAUDIO/F5-French-MixedSpeakers-reduced/model_last_reduced.pt
+      - F5TTS_VOCAB_FILE=hf://RASPIAUDIO/F5-French-MixedSpeakers-reduced/vocab.txt
+    volumes:
+      - ./voices:/app/voices
+      - f5tts-cache:/root/.cache/huggingface
+
+volumes:
+  f5tts-cache:

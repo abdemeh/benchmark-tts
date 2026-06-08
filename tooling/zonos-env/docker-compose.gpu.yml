@@ -1,0 +1,26 @@
+services:
+  zonos-tts:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    container_name: zonos-gpu-api
+    ports:
+      - "8010:8010"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - DEVICE=cuda
+      - DEFAULT_VOICE=fr-default
+    volumes:
+      - ./voices:/app/voices
+      - zonos-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  zonos-cache:

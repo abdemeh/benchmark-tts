@@ -1,0 +1,16 @@
+services:
+  chatterbox-tts:
+    build: 
+      context: ./engine  
+    container_name: chatterbox-local-api
+    ports:
+      - "8009:8000"
+    restart: unless-stopped
+    environment:
+      - HF_HOME=/app/models 
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    volumes:
+      - ./voices:/app/voices 
+      - ./models:/app/models

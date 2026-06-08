@@ -1,0 +1,21 @@
+services:
+  chatterbox-tts:
+    build: 
+      context: ./engine  
+      dockerfile: Dockerfile.gpu
+    container_name: chatterbox-aws-api
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - HF_HOME=/app/models 
+    volumes:
+      - ./voices:/app/voices 
+      - ./models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

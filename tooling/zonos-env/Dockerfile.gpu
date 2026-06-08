@@ -1,0 +1,22 @@
+# Zonos TTS — GPU image (CUDA 12.1)
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-pip git build-essential libsndfile1 ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN pip3 install --no-cache-dir torch==2.3.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cu121
+
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+
+VOLUME ["/app/voices"]
+
+ENV DEVICE=cuda
+EXPOSE 8010
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8010"]

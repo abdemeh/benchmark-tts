@@ -1,0 +1,19 @@
+services:
+  zonos-tts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zonos-local-api
+    ports:
+      - "8010:8010"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - DEVICE=cpu
+      - DEFAULT_VOICE=orion
+    volumes:
+      - ./voices:/app/voices
+      - zonos-cache:/root/.cache/huggingface
+
+volumes:
+  zonos-cache:

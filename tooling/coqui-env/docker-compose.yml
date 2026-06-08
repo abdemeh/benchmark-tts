@@ -1,0 +1,10 @@
+services:
+  xtts-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xtts-official-api
+    ports:
+      - "8000:80"
+    environment:
+      - COQUI_TOS_AGREED=1
