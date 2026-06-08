@@ -42,13 +42,14 @@ WAVS_DIR    = SCRIPT_DIR / "wavs"
 
 # ─── Phrases de test ──────────────────────────────────────────────────────────
 TEST_SENTENCES: list[str] = [
-    "Bonjour, je suis Orion, comment puis-je vous aider ?",
-    "Votre rendez-vous est confirmé pour demain à quatorze heures.",
-    "Vous avez deux interventions prévues cette semaine, le cinq et le sept juin.",
-    "Je n'ai pas trouvé d'informations correspondant à votre demande.",
-    "La mise à jour a été effectuée avec succès, vos données sont synchronisées.",
-    "Bienvenue chez Orion, votre assistant vocal intelligent.",
-    "Je suis désolé, je ne comprends pas votre question. Pouvez-vous reformuler ?",
+    #"Bonjour, je suis Orion, comment puis-je vous aider ?",
+    # "Votre rendez-vous est confirmé pour demain à quatorze heures.",
+    # "Vous avez deux interventions prévues cette semaine, le cinq et le sept juin.",
+    # "Je n'ai pas trouvé d'informations correspondant à votre demande.",
+    # "La mise à jour a été effectuée avec succès, vos données sont synchronisées.",
+    # "Bienvenue chez Orion, votre assistant vocal intelligent.",
+    # "Je suis désolé, je ne comprends pas votre question. Pouvez-vous reformuler ?",
+    "Je n'ai pas trouvé de documentation détaillée sur le planning dans la base de connaissances disponible. Pourriez-vous me préciser ce que vous souhaitez faire ? Par exemple : Consulter le planning d'un intervenant ou d'une période ? Créer des interventions ou une série d'interventions ? Modifier ou annuler des interventions existantes ? Rechercher des intervenants disponibles sur une période ? Avec plus de détails sur votre besoin, je pourrai vous guider au mieux !"
 ]
 
 # ─── Définition des moteurs ───────────────────────────────────────────────────
