@@ -417,10 +417,11 @@ def synthesize(engine_id: str, text: str, voice: str, timeout: float) -> tuple[f
 
 # ─── Benchmark d'un moteur ────────────────────────────────────────────────────
 def benchmark_engine(
-    engine_id: str, runs_per_sentence: int, timeout: float, wav_dir: Path, run_ts: str
+    engine_id: str, runs_per_sentence: int, timeout: float, wav_dir: Path, run_ts: str,
+    voices_override: list[str] | None = None,
 ) -> tuple[list[dict], list[float]]:
     cfg = ENGINES[engine_id]
-    voices = cfg["voices"]
+    voices = voices_override if voices_override is not None else cfg["voices"]
     runs: list[dict] = []
     latencies: list[float] = []
 
@@ -576,6 +577,49 @@ def choose_engines() -> list[str]:
         elif valid:
             print(c("  Sélection vide, réessayez.", "red"))
 
+def choose_voices(selected_engines: list[str]) -> dict[str, list[str]]:
+    """For each engine that has multiple voices, ask the user which to use."""
+    voice_selection: dict[str, list[str]] = {}
+    for eid in selected_engines:
+        all_voices = ENGINES[eid]["voices"]
+        if len(all_voices) <= 1:
+            voice_selection[eid] = all_voices
+            continue
+        print()
+        print(sep())
+        print(c(f"  Voix disponibles pour {c(ENGINES[eid]['card']['name'], 'bold')} :", "bold"))
+        print()
+        for i, v in enumerate(all_voices, 1):
+            label = v.replace(".wav", "")
+            print(f"  {c(str(i), 'yellow')}  {label}")
+        print()
+        print(f"  {c('*', 'yellow')}  Toutes les voix")
+        print()
+        print(sep())
+        while True:
+            raw = input(c(f"  Voix pour {eid} (numéro, virgules, ou *) : ", "bold")).strip()
+            if raw == "*":
+                voice_selection[eid] = all_voices
+                break
+            selected: list[str] = []
+            valid = True
+            for part in raw.split(","):
+                part = part.strip()
+                if part.isdigit():
+                    idx = int(part) - 1
+                    if 0 <= idx < len(all_voices):
+                        selected.append(all_voices[idx])
+                    else:
+                        print(c(f"  Numéro invalide : {part}", "red")); valid = False; break
+                else:
+                    print(c(f"  Entrée invalide : {part}", "red")); valid = False; break
+            if valid and selected:
+                voice_selection[eid] = selected
+                break
+            elif valid:
+                print(c("  Sélection vide, réessayez.", "red"))
+    return voice_selection
+
 def choose_runs() -> int:
     raw = input(c("  Runs par phrase (défaut 3) : ", "bold")).strip()
     if not raw:
@@ -638,6 +682,7 @@ def main() -> None:
     print_header(hw_type, hw_model)
 
     selected_engines = choose_engines()
+    voice_selection   = choose_voices(selected_engines)
     runs_per_sentence = choose_runs()
     json_path = choose_output(hw_type, hw_model)
 
@@ -649,12 +694,13 @@ def main() -> None:
     print(c("  Récapitulatif :", "bold"))
     print(f"  Moteurs  : {c(', '.join(selected_engines), 'cyan')}")
     voices_summary = " | ".join(
-        f"{eid}: {', '.join(ENGINES[eid]['voices'])}" for eid in selected_engines
+        f"{eid}: {', '.join(v.replace('.wav','') for v in voice_selection.get(eid, ENGINES[eid]['voices']))}"
+        for eid in selected_engines
     )
     print(f"  Voix     : {c(voices_summary, 'cyan')}")
     print(f"  Runs     : {c(str(runs_per_sentence), 'yellow')} × {len(TEST_SENTENCES)} phrases")
     total_req = sum(
-        len(ENGINES[e]["voices"]) * len(TEST_SENTENCES) * runs_per_sentence
+        len(voice_selection.get(e, ENGINES[e]["voices"])) * len(TEST_SENTENCES) * runs_per_sentence
         for e in selected_engines
     )
     print(f"  Requêtes : {c(str(total_req), 'yellow')} au total")
@@ -707,7 +753,8 @@ def main() -> None:
         wav_dir.mkdir(parents=True, exist_ok=True)
         run_ts = datetime.now().strftime("%Y%m%d-%H%M%S")
         print(f"\n  {c('Mesures en cours…', 'bold')}")
-        runs, latencies = benchmark_engine(engine_id, runs_per_sentence, timeout, wav_dir, run_ts)
+        runs, latencies = benchmark_engine(engine_id, runs_per_sentence, timeout, wav_dir, run_ts,
+                                            voices_override=voice_selection.get(engine_id))
         all_results[engine_id] = (runs, latencies)
 
         if latencies:
