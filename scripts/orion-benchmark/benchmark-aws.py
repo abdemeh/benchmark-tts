@@ -78,7 +78,7 @@ ENGINES: dict[str, dict] = {
     "kokoro": {
         "type": "TTS",
         "compose_dir": "kokoro-env",
-        "compose_file": "docker-compose.yml",   # CPU only image
+        "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
         "port": 8880,
         "health_url": "http://localhost:8880/v1/audio/voices",
         "voices": ["ff_siwis"],
@@ -86,12 +86,12 @@ ENGINES: dict[str, dict] = {
         "synthesize": "kokoro",
         "card": {
             "id": "kokoro", "name": "Kokoro", "type": "TTS",
-            "hardware": "CPU (GPU possible)", "voiceQuality": "A",
+            "hardware": "GPU (T4)", "voiceQuality": "A",
             "frenchVoices": ["ff_siwis"],
             "languages": ["en", "fr", "es", "it", "zh"], "languagesTotal": 9,
-            "languagesNote": "Param lang_code dans la requête",
+            "languagesNote": "Param lang_code dans la requ\u00eate",
             "tweaks": ["Vitesse 0.5-2.0x"],
-            "deploy": {"type": "docker-image", "image": "ghcr.io/remsky/kokoro-fastapi-cpu:latest", "pythonCode": False},
+            "deploy": {"type": "docker-image", "image": "ghcr.io/remsky/kokoro-fastapi-gpu:latest", "pythonCode": False},
         },
     },
     "coqui": {
@@ -173,7 +173,7 @@ ENGINES: dict[str, dict] = {
     "whisper": {
         "type": "STT",
         "compose_dir": "whisper-env",
-        "compose_file": "docker-compose.yml",
+        "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
         "port": 8001,
         "health_url": "http://localhost:8001/v1/models",
         "voices": ["default"],
@@ -181,12 +181,12 @@ ENGINES: dict[str, dict] = {
         "synthesize": "whisper",
         "card": {
             "id": "whisper", "name": "Whisper", "type": "STT",
-            "hardware": "CPU", "voiceQuality": "B",
+            "hardware": "GPU (T4)", "voiceQuality": "B",
             "frenchVoices": ["fr (langue forcée)"],
             "languages": ["fr", "en", "es", "it", "zh"], "languagesTotal": 99,
             "languagesNote": "Auto-détection ou param language",
             "tweaks": ["Modèle: tiny/base/small/medium/large-v3"],
-            "deploy": {"type": "docker-image", "image": "fedirz/faster-whisper-server:latest-cpu", "pythonCode": False},
+            "deploy": {"type": "docker-image", "image": "fedirz/faster-whisper-server:latest-cuda", "pythonCode": False},
         },
     },
     "vibevoice": {

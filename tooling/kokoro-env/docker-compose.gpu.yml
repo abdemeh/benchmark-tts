@@ -1,0 +1,21 @@
+services:
+  kokoro-tts:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    container_name: kokoro-gpu-api
+    ports:
+      - "8880:8880"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - kokoro-models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  kokoro-models:
