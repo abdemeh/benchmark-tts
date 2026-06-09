@@ -138,6 +138,7 @@ ENGINES: dict[str, dict] = {
         "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
         "port": 8010,
         "health_url": "http://localhost:8010/voices",
+        "startup_timeout": 1200,  # ~6 GB model download on first run
         "voices": ["orion"],
         "extra": {"speed": 1.0},
         "synthesize": "zonos",
@@ -738,11 +739,11 @@ def main() -> None:
                 continue
 
         # Wait until ready
-        ready = wait_ready(engine_id, timeout=600)
+        ready = wait_ready(engine_id, timeout=ENGINES[engine_id].get("startup_timeout", 600))
         if not ready:
             choice = input(c("  [I]gnorer  [R]éessayer l'attente : ", "yellow")).strip().lower()
             if choice == "r":
-                ready = wait_ready(engine_id, timeout=600)
+                ready = wait_ready(engine_id, timeout=ENGINES[engine_id].get("startup_timeout", 600))
             if not ready:
                 compose_down(engine_id)
                 print(c(f"  ✗ {engine_id} ignoré.", "dim"))

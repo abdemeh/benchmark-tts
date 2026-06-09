@@ -6,7 +6,7 @@ services:
     container_name: zonos-gpu-api
     ports:
       - "8010:8010"
-    restart: unless-stopped
+    restart: "no"
     environment:
       - TZ=Europe/Paris
       - DEVICE=cuda
