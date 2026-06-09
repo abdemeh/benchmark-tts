@@ -10,9 +10,9 @@ WORKDIR /app
 
 RUN pip3 install --no-cache-dir torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
 
-# Clone and install Zonos as editable (required — git+ install doesn't work)
+# Clone and install Zonos (editable mode not supported, use regular install)
 RUN git clone https://github.com/Zyphra/Zonos.git /tmp/zonos \
-    && pip3 install --no-cache-dir -e /tmp/zonos
+    && pip3 install --no-cache-dir /tmp/zonos
 
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
