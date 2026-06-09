@@ -6,7 +6,7 @@ services:
     container_name: f5tts-gpu-api
     ports:
       - "8012:8012"
-    restart: unless-stopped
+    restart: "no"
     environment:
       - TZ=Europe/Paris
       - DEVICE=cuda
