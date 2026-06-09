@@ -1,0 +1,15 @@
+services:
+  fishspeech:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    ports:
+      - "8033:8033"
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

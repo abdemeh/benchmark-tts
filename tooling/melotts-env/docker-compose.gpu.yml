@@ -1,0 +1,15 @@
+services:
+  melotts:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    ports:
+      - "8030:8030"
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

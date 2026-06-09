@@ -1,0 +1,44 @@
+# NVIDIA MagpieTTS — 357M params, tested on T4, French + 8 other languages
+# Requires PyTorch 2.6+ and Python 3.12 (NeMo 2.7+ requirement)
+# Driver 595.71.05 on AWS supports CUDA 12.6 runtime containers ✓
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Ubuntu 24.04 ships Python 3.12 by default
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-dev \
+    git \
+    libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
+# Install PyTorch 2.6.0 with CUDA 12.6 support
+# (NVIDIA driver 595.71.05 supports CUDA 12.6 runtime containers)
+RUN pip install --no-cache-dir \
+    torch==2.6.0 \
+    torchaudio==2.6.0 \
+    --index-url https://download.pytorch.org/whl/cu126
+
+# Install NeMo TTS (includes MagpieTTSModel as of NeMo 2.7+)
+RUN pip install --no-cache-dir "nemo-toolkit[tts]"
+
+# Install additional deps (kaldialign required for NeMo TTS)
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Pre-download MagpieTTS model + NanoCodec at build time
+RUN python3 -c "\
+from nemo.collections.tts.models import MagpieTTSModel; \
+MagpieTTSModel.from_pretrained('nvidia/magpie_tts_multilingual_357m'); \
+print('MagpieTTS downloaded OK')"
+
+COPY app.py /app/app.py
+WORKDIR /app
+
+EXPOSE 8034
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8034"]

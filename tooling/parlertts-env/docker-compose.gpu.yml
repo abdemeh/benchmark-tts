@@ -1,0 +1,15 @@
+services:
+  parlertts:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    ports:
+      - "8031:8031"
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

@@ -1,0 +1,48 @@
+# Fish Speech v1.5.1 — uses their own API server (tools/api_server.py)
+# T4-compatible: model weights ~2.5GB, well within 16GB VRAM
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.10 \
+    python3.10-dev \
+    python3-pip \
+    git \
+    libsndfile1 \
+    sox \
+    libsox-dev \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python3
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
+# Clone fish-speech at v1.5.1
+RUN git clone --branch v1.5.1 --depth 1 https://github.com/fishaudio/fish-speech /fish-speech
+
+WORKDIR /fish-speech
+
+# Install PyTorch first (v1.5.1 works with torch 2.3.x + cu121)
+RUN pip install --no-cache-dir \
+    torch==2.3.1+cu121 \
+    torchaudio==2.3.1+cu121 \
+    --index-url https://download.pytorch.org/whl/cu121
+
+# Install fish-speech package (editable, uses pyproject.toml)
+RUN pip install --no-cache-dir -e .
+
+# Download fish-speech-1.5 model weights
+RUN python3 -c "\
+from huggingface_hub import snapshot_download; \
+snapshot_download('fishaudio/fish-speech-1.5', local_dir='checkpoints/fish-speech-1.5')"
+
+EXPOSE 8033
+
+# Start fish-speech API server on port 8033 (mapped from internal 8080)
+# API: POST /v1/tts  → JSON body {"text": "...", "format": "wav"}
+CMD ["python3", "tools/api_server.py", \
+     "--llama-checkpoint-path", "checkpoints/fish-speech-1.5", \
+     "--decoder-checkpoint-path", "checkpoints/fish-speech-1.5/codec.pth", \
+     "--listen", "0.0.0.0:8033"]

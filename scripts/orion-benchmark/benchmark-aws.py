@@ -132,26 +132,6 @@ ENGINES: dict[str, dict] = {
             "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/chatterbox-env", "pythonCode": True},
         },
     },
-    "zonos": {
-        "type": "TTS",
-        "compose_dir": "zonos-env",
-        "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
-        "port": 8010,
-        "health_url": "http://localhost:8010/voices",
-        "startup_timeout": 1200,  # ~6 GB model download on first run
-        "voices": ["orion"],
-        "extra": {"speed": 1.0},
-        "synthesize": "zonos",
-        "card": {
-            "id": "zonos", "name": "Zonos", "type": "TTS",
-            "hardware": "GPU (T4)", "voiceQuality": "B",
-            "frenchVoices": ["orion"],
-            "languages": ["en", "fr", "de", "ja", "zh"], "languagesTotal": 5,
-            "languagesNote": "Clonage via WAV référence",
-            "tweaks": ["Vitesse", "Émotion 0.0-1.0"],
-            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/zonos-env", "pythonCode": True},
-        },
-    },
     "f5tts": {
         "type": "TTS",
         "compose_dir": "f5tts-env",
@@ -171,7 +151,103 @@ ENGINES: dict[str, dict] = {
             "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/f5tts-env", "pythonCode": True},
         },
     },
-    "whisper": {
+    "melotts": {
+        "type": "TTS",
+        "compose_dir": "melotts-env",
+        "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
+        "port": 8030,
+        "health_url": "http://localhost:8030/voices",
+        "voices": ["FR"],
+        "extra": {"speed": 1.0},
+        "synthesize": "melotts",
+        "card": {
+            "id": "melotts", "name": "MeloTTS", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "B",
+            "frenchVoices": ["FR"],
+            "languages": ["fr", "en", "es", "zh", "jp", "kr"], "languagesTotal": 6,
+            "languagesNote": "Mod\u00e8le l\u00e9ger, synth\u00e8se parall\u00e8le ultra-rapide",
+            "tweaks": ["Vitesse 0.5-2.0x"],
+            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/melotts-env", "pythonCode": True},
+        },
+    },
+    "parlertts": {
+        "type": "TTS",
+        "compose_dir": "parlertts-env",
+        "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
+        "port": 8031,
+        "health_url": "http://localhost:8031/health",
+        "voices": ["female", "male"],
+        "extra": {},
+        "synthesize": "parlertts",
+        "card": {
+            "id": "parlertts", "name": "Parler-TTS", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "A",
+            "frenchVoices": ["female", "male"],
+            "languages": ["fr", "en"], "languagesTotal": 2,
+            "languagesNote": "Contr\u00f4le vocal par description texte",
+            "tweaks": ["Description voix libre"],
+            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/parlertts-env", "pythonCode": True},
+        },
+    },    "cosyvoice": {
+        "type": "TTS",
+        "compose_dir": "cosyvoice-env",
+        "compose_file": "docker-compose.gpu.yml",
+        "port": 8032,
+        "health_url": "http://localhost:8032/health",
+        "startup_timeout": 300,
+        "voices": ["\u82f1\u6587\u5973"],  # English-female SFT speaker (multilingual — handles French text)
+        "extra": {},
+        "synthesize": "cosyvoice",
+        "card": {
+            "id": "cosyvoice", "name": "CosyVoice 2", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "A",
+            "frenchVoices": ["\u82f1\u6587\u5973 (multilingual)"],
+            "languages": ["fr", "en", "zh", "ja", "ko", "de", "es", "ru", "it"], "languagesTotal": 9,
+            "languagesNote": "LLM-based 0.5B, z\u00e9ro-shot multilingual",
+            "tweaks": ["Voix SFT", "Zero-shot cloning"],
+            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/cosyvoice-env", "pythonCode": True},
+        },
+    },
+    "fishspeech": {
+        "type": "TTS",
+        "compose_dir": "fishspeech-env",
+        "compose_file": "docker-compose.gpu.yml",
+        "port": 8033,
+        "health_url": "http://localhost:8033/v1/health",
+        "startup_timeout": 240,
+        "voices": ["default"],
+        "extra": {},
+        "synthesize": "fishspeech",
+        "card": {
+            "id": "fishspeech", "name": "Fish Speech 1.5", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "A",
+            "frenchVoices": ["default (al\u00e9atoire)"],
+            "languages": ["fr", "en", "zh", "ja", "de", "es", "ko", "ar", "ru"], "languagesTotal": 13,
+            "languagesNote": "~20k h fr, synth\u00e8se sans r\u00e9f\u00e9rence audio",
+            "tweaks": ["Seed", "Temp\u00e9rature", "Clonage vocal 0-shot"],
+            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/fishspeech-env", "pythonCode": True},
+        },
+    },
+    "magpietts": {
+        "type": "TTS",
+        "compose_dir": "magpietts-env",
+        "compose_file": "docker-compose.gpu.yml",
+        "port": 8034,
+        "health_url": "http://localhost:8034/health",
+        "startup_timeout": 300,
+        "voices": ["Sofia", "Aria"],
+        "extra": {"language": "fr"},
+        "synthesize": "magpietts",
+        "card": {
+            "id": "magpietts", "name": "NVIDIA MagpieTTS", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "A",
+            "frenchVoices": ["Sofia", "Aria"],
+            "languages": ["fr", "en", "es", "de", "it", "zh", "hi", "ja", "vi"], "languagesTotal": 9,
+            "languagesNote": "NVIDIA NeMo 357M, test\u00e9 officiellement sur T4",
+            "tweaks": ["Locuteur", "Langue", "Text normalization"],
+            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/magpietts-env", "pythonCode": True},
+        },
+    },    "whisper": {
         "type": "STT",
         "compose_dir": "whisper-env",
         "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
@@ -188,25 +264,6 @@ ENGINES: dict[str, dict] = {
             "languagesNote": "Auto-détection ou param language",
             "tweaks": ["Modèle: tiny/base/small/medium/large-v3"],
             "deploy": {"type": "docker-image", "image": "fedirz/faster-whisper-server:latest-cuda", "pythonCode": False},
-        },
-    },
-    "vibevoice": {
-        "type": "TTS",
-        "compose_dir": "vibevoice-env",
-        "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
-        "port": 8020,
-        "health_url": "http://localhost:8020/voices",
-        "voices": ["fr-Spk0_man", "fr-Spk1_woman"],
-        "extra": {},
-        "synthesize": "vibevoice",
-        "card": {
-            "id": "vibevoice", "name": "VibeVoice", "type": "TTS",
-            "hardware": "GPU (T4)", "voiceQuality": "B",
-            "frenchVoices": ["fr-Spk0_man", "fr-Spk1_woman"],
-            "languages": ["en", "fr"], "languagesTotal": 2,
-            "languagesNote": "Cross-lingual transfer — instable selon FAQ officielle",
-            "tweaks": ["Voix via .pt preset"],
-            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/vibevoice-env", "pythonCode": True},
         },
     },
 }
@@ -383,11 +440,6 @@ def synthesize(engine_id: str, text: str, voice: str, timeout: float) -> tuple[f
                 "cfg_weight": extra.get("cfg_weight", 0.3),
             }, timeout=(5, timeout))
 
-        elif mode == "zonos":
-            r = requests.post("http://localhost:8010/tts", json={
-                "text": text, "voice": voice, "speed": extra.get("speed", 1.0),
-            }, timeout=(5, timeout))
-
         elif mode == "f5tts":
             r = requests.post("http://localhost:8012/tts", json={
                 "text": text, "voice": voice,
@@ -395,9 +447,32 @@ def synthesize(engine_id: str, text: str, voice: str, timeout: float) -> tuple[f
                 "nfe_step": extra.get("nfe_step", 32),
             }, timeout=(5, timeout))
 
-        elif mode == "vibevoice":
-            r = requests.post("http://localhost:8020/tts", json={
+        elif mode == "melotts":
+            r = requests.post("http://localhost:8030/tts", json={
+                "text": text, "voice": voice, "speed": extra.get("speed", 1.0),
+            }, timeout=(5, timeout))
+
+        elif mode == "parlertts":
+            r = requests.post("http://localhost:8031/tts", json={
                 "text": text, "voice": voice,
+            }, timeout=(5, timeout))
+
+        elif mode == "cosyvoice":
+            r = requests.post("http://localhost:8032/tts", json={
+                "text": text, "voice": voice,
+            }, timeout=(5, timeout))
+
+        elif mode == "fishspeech":
+            # Fish Speech v1.5 API: POST /v1/tts with JSON body
+            # voice parameter is not used (random voice synthesis)
+            r = requests.post("http://localhost:8033/v1/tts",
+                json={"text": text, "format": "wav", "streaming": False},
+                headers={"Content-Type": "application/json"},
+                timeout=(5, timeout))
+
+        elif mode == "magpietts":
+            r = requests.post("http://localhost:8034/tts", json={
+                "text": text, "voice": voice, "language": extra.get("language", "fr"),
             }, timeout=(5, timeout))
 
         elif mode == "whisper":

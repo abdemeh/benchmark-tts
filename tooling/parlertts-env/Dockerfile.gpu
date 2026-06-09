@@ -1,0 +1,31 @@
+FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+
+WORKDIR /app
+
+# System deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Pin transformers to avoid float8 error with torch 2.1/2.5
+RUN pip install --no-cache-dir transformers==4.46.3
+
+# Install Parler-TTS
+RUN pip install --no-cache-dir parler-tts
+
+# Install API deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+
+# Pre-download model weights into image layer
+# Cached at /root/.cache/huggingface during build
+RUN python -c "from parler_tts import ParlerTTSForConditionalGeneration; \
+    from transformers import AutoTokenizer; \
+    ParlerTTSForConditionalGeneration.from_pretrained('parler-tts/parler-tts-mini-v1'); \
+    AutoTokenizer.from_pretrained('parler-tts/parler-tts-mini-v1')"
+
+EXPOSE 8031
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8031"]

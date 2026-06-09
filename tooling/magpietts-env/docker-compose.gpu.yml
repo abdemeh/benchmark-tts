@@ -1,0 +1,15 @@
+services:
+  magpietts:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    ports:
+      - "8034:8034"
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
