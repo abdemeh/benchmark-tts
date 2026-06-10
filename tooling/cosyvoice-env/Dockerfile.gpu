@@ -53,6 +53,7 @@ RUN pip install --no-cache-dir \
     protobuf==4.25.3 \
     huggingface_hub \
     openai-whisper==20231117 \
+    inflect \
     fastapi==0.115.6 \
     uvicorn[standard]==0.30.0
 
