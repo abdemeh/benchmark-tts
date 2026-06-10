@@ -452,15 +452,6 @@ def synthesize(engine_id: str, text: str, voice: str, timeout: float) -> tuple[f
                 "text": text, "voice": voice, "speed": extra.get("speed", 1.0),
             }, timeout=(5, timeout))
 
-        elif mode == "parlertts":
-            r = requests.post("http://localhost:8031/tts", json={
-                "text": text, "voice": voice,
-            }, timeout=(5, timeout))
-
-        elif mode == "cosyvoice":
-            r = requests.post("http://localhost:8032/tts", json={
-                "text": text, "voice": voice,
-            }, timeout=(5, timeout))
 
         elif mode == "fishspeech":
             # Fish Speech v1.5 API: POST /v1/tts with JSON body
