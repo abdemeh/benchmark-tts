@@ -1,0 +1,17 @@
+services:
+  cosyvoice:
+    image: cosyvoice-gpu
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    container_name: cosyvoice-env-cosyvoice-1
+    ports:
+      - "8032:8032"
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
