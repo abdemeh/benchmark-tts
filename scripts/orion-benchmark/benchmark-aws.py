@@ -188,25 +188,6 @@ ENGINES: dict[str, dict] = {
             "tweaks": ["Description voix libre"],
             "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/parlertts-env", "pythonCode": True},
         },
-    },    "cosyvoice": {
-        "type": "TTS",
-        "compose_dir": "cosyvoice-env",
-        "compose_file": "docker-compose.gpu.yml",
-        "port": 8032,
-        "health_url": "http://localhost:8032/health",
-        "startup_timeout": 300,
-        "voices": ["\u82f1\u6587\u5973"],  # English-female SFT speaker (multilingual — handles French text)
-        "extra": {},
-        "synthesize": "cosyvoice",
-        "card": {
-            "id": "cosyvoice", "name": "CosyVoice 2", "type": "TTS",
-            "hardware": "GPU (T4)", "voiceQuality": "A",
-            "frenchVoices": ["\u82f1\u6587\u5973 (multilingual)"],
-            "languages": ["fr", "en", "zh", "ja", "ko", "de", "es", "ru", "it"], "languagesTotal": 9,
-            "languagesNote": "LLM-based 0.5B, z\u00e9ro-shot multilingual",
-            "tweaks": ["Voix SFT", "Zero-shot cloning"],
-            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/cosyvoice-env", "pythonCode": True},
-        },
     },
     "fishspeech": {
         "type": "TTS",
