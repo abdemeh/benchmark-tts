@@ -30,8 +30,8 @@ RUN pip install --no-cache-dir \
     torchaudio==2.3.1+cu121 \
     --index-url https://download.pytorch.org/whl/cu121
 
-# Install fish-speech package (editable, uses pyproject.toml)
-RUN pip install --no-cache-dir -e .
+# Install fish-speech dependencies (pyproject.toml doesn't support editable install)
+RUN pip install --no-cache-dir .
 
 # Download fish-speech-1.5 model weights
 RUN python3 -c "\
