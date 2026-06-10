@@ -1,5 +1,6 @@
 services:
   f5tts:
+    image: f5tts-gpu
     build:
       context: .
       dockerfile: Dockerfile.gpu

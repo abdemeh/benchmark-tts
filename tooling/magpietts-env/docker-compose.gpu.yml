@@ -1,5 +1,6 @@
 services:
   magpietts:
+    image: magpietts-gpu
     build:
       context: .
       dockerfile: Dockerfile.gpu

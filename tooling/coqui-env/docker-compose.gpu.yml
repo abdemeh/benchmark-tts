@@ -1,5 +1,6 @@
 services:
   xtts-api:
+    image: coqui-gpu
     build:
       context: .
       dockerfile: Dockerfile.gpu

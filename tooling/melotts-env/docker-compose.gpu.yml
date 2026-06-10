@@ -1,5 +1,6 @@
 services:
   melotts:
+    image: melotts-gpu
     build:
       context: .
       dockerfile: Dockerfile.gpu

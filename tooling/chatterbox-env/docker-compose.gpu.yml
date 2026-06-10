@@ -1,5 +1,6 @@
 services:
   chatterbox-tts:
+    image: chatterbox-gpu
     build: 
       context: ./engine  
       dockerfile: Dockerfile.gpu

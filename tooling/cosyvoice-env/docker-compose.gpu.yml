@@ -1,5 +1,6 @@
 services:
   cosyvoice:
+    image: cosyvoice-gpu
     build:
       context: .
       dockerfile: Dockerfile.gpu

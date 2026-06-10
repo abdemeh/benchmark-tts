@@ -1,5 +1,6 @@
 services:
   fishspeech:
+    image: fishspeech-gpu
     build:
       context: .
       dockerfile: Dockerfile.gpu
