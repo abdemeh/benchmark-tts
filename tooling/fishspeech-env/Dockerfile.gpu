@@ -76,5 +76,5 @@ EXPOSE 8033
 # API: POST /v1/tts  → JSON body {"text": "...", "format": "wav"}
 CMD ["python3", "tools/api_server.py", \
      "--llama-checkpoint-path", "checkpoints/fish-speech-1.5", \
-     "--decoder-checkpoint-path", "checkpoints/fish-speech-1.5/codec.pth", \
+     "--decoder-checkpoint-path", "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth", \
      "--listen", "0.0.0.0:8033"]
