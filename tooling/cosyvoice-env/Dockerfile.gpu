@@ -30,8 +30,7 @@ RUN git clone --recursive https://github.com/FunAudioLLM/CosyVoice /cosyvoice
 
 WORKDIR /cosyvoice
 
-# Install CosyVoice runtime dependencies (from their requirements.txt)
-# Skipping: torch (already installed), modelscope mirror, training-only pkgs
+# Layer 1: core ML/audio — rarely changes
 RUN pip install --no-cache-dir \
     conformer==0.3.2 \
     diffusers==0.29.0 \
@@ -51,10 +50,19 @@ RUN pip install --no-cache-dir \
     grpcio==1.57.0 \
     grpcio-tools==1.57.0 \
     protobuf==4.25.3 \
-    huggingface_hub \
+    huggingface_hub
+
+# Layer 2: runtime extras — add missing deps here
+RUN pip install --no-cache-dir \
     openai-whisper==20231117 \
-    inflect \
-    rich \
+    inflect==7.3.1 \
+    rich==13.7.1 \
+    gdown==5.1.0 \
+    wget==3.2 \
+    matplotlib==3.7.5 \
+    scipy \
+    Unidecode \
+    phonemizer \
     fastapi==0.115.6 \
     uvicorn[standard]==0.30.0
 
