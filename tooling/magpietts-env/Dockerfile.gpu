@@ -19,17 +19,17 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 # Install PyTorch 2.6.0 with CUDA 12.6 support
 # (NVIDIA driver 595.71.05 supports CUDA 12.6 runtime containers)
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --break-system-packages \
     torch==2.6.0 \
     torchaudio==2.6.0 \
     --index-url https://download.pytorch.org/whl/cu126
 
 # Install NeMo TTS (includes MagpieTTSModel as of NeMo 2.7+)
-RUN pip install --no-cache-dir "nemo-toolkit[tts]"
+RUN pip install --no-cache-dir --break-system-packages "nemo-toolkit[tts]"
 
 # Install additional deps (kaldialign required for NeMo TTS)
 COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir --break-system-packages -r /app/requirements.txt
 
 # Pre-download MagpieTTS model + NanoCodec at build time
 RUN python3 -c "\
