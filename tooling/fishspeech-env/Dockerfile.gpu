@@ -26,8 +26,8 @@ WORKDIR /fish-speech
 
 # Install PyTorch first (v1.5.1 works with torch 2.3.x + cu121)
 RUN pip install --no-cache-dir \
-    torch==2.3.1+cu121 \
-    torchaudio==2.3.1+cu121 \
+    torch==2.4.1+cu121 \
+    torchaudio==2.4.1+cu121 \
     --index-url https://download.pytorch.org/whl/cu121
 
 # Install ALL fish-speech deps from pyproject.toml at once
@@ -56,6 +56,7 @@ RUN pip install --no-cache-dir \
     "pydub" \
     "faster_whisper" \
     "opencc-python-reimplemented==0.1.7" \
+    "funasr==1.1.5" \
     "silero-vad" \
     "ormsgpack" \
     "tiktoken>=0.8.0" \
