@@ -30,34 +30,39 @@ RUN pip install --no-cache-dir \
     torchaudio==2.3.1+cu121 \
     --index-url https://download.pytorch.org/whl/cu121
 
-# Install fish-speech dependencies (pyproject.toml doesn't support editable install)
-RUN pip install --no-cache-dir .
-
-# Install runtime deps not pulled by the wheel build
+# Install ALL fish-speech deps from pyproject.toml at once
+# (pip install . creates a dummy wheel without installing deps — skip it)
+# Skipping: gradio, wandb, modelscope, funasr, pyaudio, grpcio (not needed for inference)
 RUN pip install --no-cache-dir \
-    pyrootutils \
-    huggingface_hub \
-    "pydantic==2.9.2" \
-    fastapi \
-    "uvicorn[standard]" \
-    loralib \
-    "vector-quantize-pytorch==1.14.24" \
-    encodec \
-    matplotlib \
-    einops \
-    natsort \
-    click \
-    loguru \
+    "numpy<=1.26.4" \
+    "transformers>=4.45.2" \
+    "datasets==2.18.0" \
+    "lightning>=2.1.0" \
+    "hydra-core>=1.3.2" \
+    "tensorboard>=2.14.1" \
+    "natsort>=8.4.0" \
+    "einops>=0.7.0" \
+    "librosa>=0.10.1" \
+    "rich>=13.5.3" \
     "kui>=1.6.0" \
-    ormsgpack \
-    resampy \
+    "uvicorn>=0.30.0" \
+    "loguru>=0.6.0" \
+    "loralib>=0.1.2" \
+    "pyrootutils>=1.0.4" \
+    "vector_quantize_pytorch==1.14.24" \
+    "resampy>=0.4.3" \
     "einx[torch]==0.2.2" \
-    zstandard \
-    pydub \
-    cachetools \
-    tiktoken \
-    silero-vad \
-    faster-whisper
+    "zstandard>=0.22.0" \
+    "pydub" \
+    "faster_whisper" \
+    "opencc-python-reimplemented==0.1.7" \
+    "silero-vad" \
+    "ormsgpack" \
+    "tiktoken>=0.8.0" \
+    "pydantic==2.9.2" \
+    "cachetools" \
+    "huggingface_hub" \
+    "soundfile"
 
 # Download fish-speech-1.5 model weights
 RUN python3 -c "\
