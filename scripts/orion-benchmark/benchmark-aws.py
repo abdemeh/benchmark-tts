@@ -335,7 +335,7 @@ def compose_up(engine_id: str) -> bool:
     compose_dir = TOOLING_DIR / cfg["compose_dir"]
     compose_file = cfg["compose_file"]
     print(f"  {c('▶', 'cyan')} Démarrage {c(engine_id, 'bold')} ({compose_file}) …", flush=True)
-    cmd = ["docker", "compose", "-f", str(compose_dir / compose_file), "up", "-d", "--build"]
+    cmd = ["docker", "compose", "-f", str(compose_dir / compose_file), "up", "-d"]
     # Stream output line by line so the user sees build progress
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
