@@ -37,17 +37,27 @@ RUN pip install --no-cache-dir .
 RUN pip install --no-cache-dir \
     pyrootutils \
     huggingface_hub \
-    pydantic \
+    "pydantic==2.9.2" \
     fastapi \
-    uvicorn[standard] \
+    "uvicorn[standard]" \
     loralib \
-    vector-quantize-pytorch \
+    "vector-quantize-pytorch==1.14.24" \
     encodec \
     matplotlib \
     einops \
     natsort \
     click \
-    loguru
+    loguru \
+    "kui>=1.6.0" \
+    ormsgpack \
+    resampy \
+    "einx[torch]==0.2.2" \
+    zstandard \
+    pydub \
+    cachetools \
+    tiktoken \
+    silero-vad \
+    faster-whisper
 
 # Download fish-speech-1.5 model weights
 RUN python3 -c "\
