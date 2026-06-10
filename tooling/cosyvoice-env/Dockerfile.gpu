@@ -52,6 +52,7 @@ RUN pip install --no-cache-dir \
     grpcio-tools==1.57.0 \
     protobuf==4.25.3 \
     huggingface_hub \
+    openai-whisper==20231117 \
     fastapi==0.115.6 \
     uvicorn[standard]==0.30.0
 
