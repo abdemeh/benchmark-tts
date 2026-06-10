@@ -33,8 +33,21 @@ RUN pip install --no-cache-dir \
 # Install fish-speech dependencies (pyproject.toml doesn't support editable install)
 RUN pip install --no-cache-dir .
 
-# Install huggingface_hub for model download
-RUN pip install --no-cache-dir huggingface_hub
+# Install runtime deps not pulled by the wheel build
+RUN pip install --no-cache-dir \
+    pyrootutils \
+    huggingface_hub \
+    pydantic \
+    fastapi \
+    uvicorn[standard] \
+    loralib \
+    vector-quantize-pytorch \
+    encodec \
+    matplotlib \
+    einops \
+    natsort \
+    click \
+    loguru
 
 # Download fish-speech-1.5 model weights
 RUN python3 -c "\
