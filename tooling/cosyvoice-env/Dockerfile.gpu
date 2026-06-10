@@ -54,6 +54,7 @@ RUN pip install --no-cache-dir \
     huggingface_hub \
     openai-whisper==20231117 \
     inflect \
+    rich \
     fastapi==0.115.6 \
     uvicorn[standard]==0.30.0
 
