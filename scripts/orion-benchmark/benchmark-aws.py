@@ -229,26 +229,7 @@ ENGINES: dict[str, dict] = {
             "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/magpietts-env", "pythonCode": True},
         },
     },
-    "cosyvoice": {
-        "type": "TTS",
-        "compose_dir": "cosyvoice-env",
-        "compose_file": "docker-compose.gpu.yml",
-        "port": 8032,
-        "health_url": "http://localhost:8032/health",
-        "startup_timeout": 300,
-        "voices": ["英文女", "英文男"],
-        "extra": {},
-        "synthesize": "cosyvoice",
-        "card": {
-            "id": "cosyvoice", "name": "CosyVoice 2", "type": "TTS",
-            "hardware": "GPU (T4)", "voiceQuality": "A",
-            "frenchVoices": ["英文女", "英文男"],
-            "languages": ["fr", "en", "zh", "ja", "ko", "de", "es", "ru", "it"], "languagesTotal": 9,
-            "languagesNote": "LLM-based 0.5B, zéro-shot multilingual",
-            "tweaks": ["Voix SFT", "Zero-shot cloning"],
-            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/cosyvoice-env", "pythonCode": True},
-        },
-    },    "whisper": {
+    "whisper": {
         "type": "STT",
         "compose_dir": "whisper-env",
         "compose_file": "docker-compose.gpu.yml",  # GPU on AWS
@@ -465,11 +446,6 @@ def synthesize(engine_id: str, text: str, voice: str, timeout: float) -> tuple[f
         elif mode == "magpietts":
             r = requests.post("http://localhost:8034/tts", json={
                 "text": text, "voice": voice, "language": extra.get("language", "fr"),
-            }, timeout=(5, timeout))
-
-        elif mode == "cosyvoice":
-            r = requests.post("http://localhost:8032/tts", json={
-                "text": text, "voice": voice,
             }, timeout=(5, timeout))
 
         elif mode == "whisper":
