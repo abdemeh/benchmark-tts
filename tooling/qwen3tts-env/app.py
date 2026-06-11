@@ -10,17 +10,21 @@ MODEL_PATH = "/models/Qwen3-TTS-0.6B"
 
 SPEAKERS = ["Ryan", "Aiden", "Serena", "Vivian"]
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+def load_model():
     global _model
     from qwen_tts import Qwen3TTSModel
+    torch.cuda.empty_cache()
     print("Loading Qwen3-TTS 0.6B CustomVoice...")
     _model = Qwen3TTSModel.from_pretrained(
         MODEL_PATH,
         device_map="cuda:0",
-        dtype=torch.float16,  # T4 is Turing arch — no native bfloat16, use float16
+        dtype=torch.float16,  # T4 is Turing arch — no native bfloat16
     )
     print("Qwen3-TTS loaded.")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    load_model()
     yield
 
 app = FastAPI(lifespan=lifespan)
@@ -35,6 +39,7 @@ def voices():
 
 @app.post("/tts")
 async def tts(body: dict):
+    global _model
     text = body.get("text", "")
     voice = body.get("voice", "Ryan")
     language = body.get("language", "French")
@@ -54,4 +59,20 @@ async def tts(body: dict):
         buf.seek(0)
         return Response(content=buf.read(), media_type="audio/wav")
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        err = str(e)
+        # CUDA context poisoned by device-side assert — reload model and retry once
+        if "CUDA" in err or "cuda" in err:
+            print(f"[WARN] CUDA error detected, reloading model: {err[:120]}")
+            try:
+                load_model()
+                with torch.no_grad():
+                    wavs, sr = _model.generate_custom_voice(
+                        text=text, language=language, speaker=voice,
+                    )
+                buf = io.BytesIO()
+                sf.write(buf, wavs[0], sr, format="WAV")
+                buf.seek(0)
+                return Response(content=buf.read(), media_type="audio/wav")
+            except Exception as e2:
+                return JSONResponse(status_code=500, content={"error": str(e2)})
+        return JSONResponse(status_code=500, content={"error": err})
