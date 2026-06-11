@@ -20,7 +20,6 @@ async def lifespan(app: FastAPI):
         device_map="cuda:0",
         dtype=torch.float16,  # T4 is Turing arch — no native bfloat16, use float16
     )
-    _model.eval()
     print("Qwen3-TTS loaded.")
     yield
 

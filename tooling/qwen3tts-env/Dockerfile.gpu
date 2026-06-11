@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git libsndfile1 \
+    git libsndfile1 sox \
     && rm -rf /var/lib/apt/lists/*
 
 # Layer 1: FastAPI + audio libs
