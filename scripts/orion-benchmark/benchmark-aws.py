@@ -229,6 +229,63 @@ ENGINES: dict[str, dict] = {
             "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/magpietts-env", "pythonCode": True},
         },
     },
+    "qwen3tts": {
+        "type": "TTS",
+        "compose_dir": "qwen3tts-env",
+        "compose_file": "docker-compose.gpu.yml",
+        "port": 8035,
+        "health_url": "http://localhost:8035/health",
+        "voices": ["Ryan", "Serena"],
+        "extra": {},
+        "synthesize": "qwen3tts",
+        "card": {
+            "id": "qwen3tts", "name": "Qwen3-TTS 0.6B", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "B+",
+            "frenchVoices": ["Ryan", "Serena"],
+            "languages": ["fr", "en", "zh", "ja", "ko", "de", "ru", "pt", "es", "it"], "languagesTotal": 10,
+            "languagesNote": "Qwen3-TTS-12Hz-0.6B-CustomVoice, Apache 2.0",
+            "tweaks": ["Speaker", "Langue"],
+            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/qwen3tts-env", "pythonCode": True},
+        },
+    },
+    "voxtral": {
+        "type": "TTS",
+        "compose_dir": "voxtral-env",
+        "compose_file": "docker-compose.gpu.yml",
+        "port": 8036,
+        "health_url": "http://localhost:8036/health",
+        "voices": ["casual_male", "professional_female"],
+        "extra": {},
+        "synthesize": "voxtral",
+        "card": {
+            "id": "voxtral", "name": "Voxtral 4B", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "A",
+            "frenchVoices": ["casual_male", "professional_female"],
+            "languages": ["fr", "en", "es", "it", "de", "pt"], "languagesTotal": 6,
+            "languagesNote": "Mistral Voxtral-4B-TTS-2603, CC-BY-NC-4.0, vllm-omni",
+            "tweaks": ["Voice preset", "vLLM params"],
+            "deploy": {"type": "docker-image", "image": "vllm/vllm-omni:v0.18.0", "pythonCode": False},
+        },
+    },
+    "bark": {
+        "type": "TTS",
+        "compose_dir": "bark-env",
+        "compose_file": "docker-compose.gpu.yml",
+        "port": 8037,
+        "health_url": "http://localhost:8037/health",
+        "voices": ["fr_speaker_3", "fr_speaker_6"],
+        "extra": {},
+        "synthesize": "bark",
+        "card": {
+            "id": "bark", "name": "Bark (small)", "type": "TTS",
+            "hardware": "GPU (T4)", "voiceQuality": "B",
+            "frenchVoices": ["fr_speaker_3", "fr_speaker_6"],
+            "languages": ["fr", "en", "de", "es", "hi", "it", "ja", "ko", "pl", "pt", "ru", "tr", "zh"], "languagesTotal": 13,
+            "languagesNote": "suno/bark-small, MIT license",
+            "tweaks": ["Speaker preset v2/fr_speaker_*"],
+            "deploy": {"type": "docker-build", "image": None, "buildDir": "tooling/bark-env", "pythonCode": True},
+        },
+    },
     "whisper": {
         "type": "STT",
         "compose_dir": "whisper-env",
@@ -446,6 +503,24 @@ def synthesize(engine_id: str, text: str, voice: str, timeout: float) -> tuple[f
         elif mode == "magpietts":
             r = requests.post("http://localhost:8034/tts", json={
                 "text": text, "voice": voice, "language": extra.get("language", "fr"),
+            }, timeout=(5, timeout))
+
+        elif mode == "qwen3tts":
+            r = requests.post("http://localhost:8035/tts", json={
+                "text": text, "voice": voice, "language": "French",
+            }, timeout=(5, timeout))
+
+        elif mode == "voxtral":
+            r = requests.post("http://localhost:8036/v1/audio/speech", json={
+                "model": "mistralai/Voxtral-4B-TTS-2603",
+                "input": text,
+                "voice": voice,
+                "response_format": "wav",
+            }, timeout=(5, timeout))
+
+        elif mode == "bark":
+            r = requests.post("http://localhost:8037/tts", json={
+                "text": text, "voice": voice,
             }, timeout=(5, timeout))
 
         elif mode == "whisper":

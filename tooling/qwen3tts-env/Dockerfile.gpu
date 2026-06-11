@@ -1,0 +1,29 @@
+# Qwen3-TTS 0.6B — Apache 2.0, multilingual (FR/EN/ZH/JP/KO/DE/RU/PT/ES/IT)
+# Uses official qwen-tts package — pip install qwen-tts
+FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Layer 1: FastAPI + audio libs
+RUN pip install --no-cache-dir \
+    fastapi uvicorn[standard] soundfile scipy \
+    huggingface_hub
+
+# Layer 2: qwen-tts (pulls transformers, torch deps)
+RUN pip install --no-cache-dir qwen-tts
+
+# Pre-download model at build time
+RUN python3 -c "\
+from huggingface_hub import snapshot_download; \
+snapshot_download('Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice', local_dir='/models/Qwen3-TTS-0.6B')"
+
+COPY app.py /app/app.py
+WORKDIR /app
+
+EXPOSE 8035
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8035"]

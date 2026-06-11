@@ -1,0 +1,16 @@
+services:
+  qwen3tts:
+    image: qwen3tts-gpu
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    ports:
+      - "8035:8035"
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

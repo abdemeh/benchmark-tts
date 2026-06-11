@@ -1,0 +1,16 @@
+services:
+  bark:
+    image: bark-gpu
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    ports:
+      - "8037:8037"
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

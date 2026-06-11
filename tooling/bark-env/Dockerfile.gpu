@@ -1,0 +1,27 @@
+# Bark — suno/bark, MIT license, multilingual incl. French via speaker presets
+FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+# Pre-download models to /models at build time
+ENV XDG_CACHE_HOME=/models
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir \
+    fastapi uvicorn[standard] scipy soundfile \
+    transformers accelerate
+
+# Pre-download bark-small model (lighter, fits T4 easily ~1.5GB)
+RUN python3 -c "\
+from transformers import AutoProcessor, AutoModel; \
+AutoProcessor.from_pretrained('suno/bark-small'); \
+AutoModel.from_pretrained('suno/bark-small')"
+
+COPY app.py /app/app.py
+WORKDIR /app
+
+EXPOSE 8037
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8037"]
