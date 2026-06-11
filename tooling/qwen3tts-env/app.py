@@ -18,7 +18,7 @@ def load_model():
     _model = Qwen3TTSModel.from_pretrained(
         MODEL_PATH,
         device_map="cuda:0",
-        dtype=torch.float16,  # T4 is Turing arch — no native bfloat16
+        dtype=torch.float32,  # float16 causes device-side assert on T4 (NaN in embeddings)
     )
     print("Qwen3-TTS loaded.")
 
