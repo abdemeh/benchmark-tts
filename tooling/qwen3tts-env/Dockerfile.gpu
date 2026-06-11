@@ -1,6 +1,7 @@
 # Qwen3-TTS 0.6B — Apache 2.0, multilingual (FR/EN/ZH/JP/KO/DE/RU/PT/ES/IT)
 # Uses official qwen-tts package — pip install qwen-tts
-FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+# torch 2.5+ required: register_pytree_node moved in 2.2, qwen-tts needs 2.5+
+FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
 
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
