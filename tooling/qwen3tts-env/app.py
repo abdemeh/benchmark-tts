@@ -18,8 +18,9 @@ async def lifespan(app: FastAPI):
     _model = Qwen3TTSModel.from_pretrained(
         MODEL_PATH,
         device_map="cuda:0",
-        dtype=torch.bfloat16,
+        dtype=torch.float16,  # T4 is Turing arch — no native bfloat16, use float16
     )
+    _model.eval()
     print("Qwen3-TTS loaded.")
     yield
 
@@ -43,11 +44,12 @@ async def tts(body: dict):
         return JSONResponse(status_code=400, content={"error": "text required"})
 
     try:
-        wavs, sr = _model.generate_custom_voice(
-            text=text,
-            language=language,
-            speaker=voice,
-        )
+        with torch.no_grad():
+            wavs, sr = _model.generate_custom_voice(
+                text=text,
+                language=language,
+                speaker=voice,
+            )
         buf = io.BytesIO()
         sf.write(buf, wavs[0], sr, format="WAV")
         buf.seek(0)
